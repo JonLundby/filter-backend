@@ -15,6 +15,47 @@ export class FilterHandler {
    * BE AWARE, they are inter-dependent which means some units have certain modules and some locations have multiple units
    */
 
+  /** GET all LOCATIONS - '/api/filters/locations' */
+  getLocations = async (req: Request, res: Response<LocationResponse>) => {
+    try {
+      const allLocations = await this.repository.getAllLocations();
+      res.json({
+        locations: allLocations,
+      });
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      res.status(500).json({ locations: [] });
+    }
+  };
+
+  /** GET all UNITS - '/api/filters/units' */
+  getUnits = async (req: Request, res: Response<UnitResponse>) => {
+    try {
+      const allUnits = await this.repository.getAllUnits();
+
+      res.json({
+        units: allUnits,
+      });
+    } catch (error) {
+      console.error('Error fetching units:', error);
+      res.status(500).json({ units: [] });
+    }
+  };
+
+  /** GET all MODULES'/api/filters/modules' */
+  getModules = async (req: Request, res: Response<ModuleResponse>) => {
+    try {
+      const allModules = await this.repository.getAllModules();
+      res.json({
+        modules: allModules,
+      });
+    } catch (error) {
+      console.error('Error fetching modules:', error);
+      res.status(500).json({ modules: [] });
+    }
+  };
+  
+
   /** DO NOT CHANGE THIS HANDLER - this one checks you provided body payload of selected filters */
   validateFilters = async (
     req: Request,

@@ -12,8 +12,23 @@ import { Module, Unit, Location } from '../types';
 export class FilterRepository {
   constructor(private db: Database) {}
 
-  /** Write you DB calls here */
+  /** Write you DB calls here */  
+  /** Fetch all LOCATIONS*/
+  async getAllLocations(): Promise<Location[]> {
+    return this.db.select().from(locations);
+  }
+  
+  /** Fetch all UNITS*/
+  async getAllUnits(): Promise<Unit[]> {
+    return this.db.select().from(units);
+  }
 
+  /** Fetch all MODULES*/
+  async getAllModules(): Promise<Module[]> {
+    return this.db.select().from(modules);
+  }
+  
+  
   /** DO NOT TOUCH this DB call - it checks your provided filters combination and return whether it is valid or not */
   async validateFilterCombination(
     moduleIds: number[],
