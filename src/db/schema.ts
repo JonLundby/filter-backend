@@ -5,14 +5,14 @@ import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 
 // The table for mapping units to locations
 export const unitLocationMapping = sqliteTable('unit_locations', {
-  unitId: integer('unit_id'),
-  locationId: integer('location_id'),
+  unitId: integer('unit_id').notNull(), // adding notNull() to make sure the column is not nullable when using inArray()
+  locationId: integer('location_id').notNull(),
 });
 
 // The table for mapping modules to units
 export const moduleUnitMapping = sqliteTable('module_units', {
-  moduleId: integer('module_id'),
-  unitId: integer('unit_id'),
+  moduleId: integer('module_id').notNull(), // adding notNull() to make sure the column is not nullable when using inArray()
+  unitId: integer('unit_id').notNull(),
 });
 
 // The locations/units table

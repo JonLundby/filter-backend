@@ -15,23 +15,62 @@ export class FilterHandler {
    * BE AWARE, they are inter-dependent which means some units have certain modules and some locations have multiple units
    */
 
-  /** GET all LOCATIONS - '/api/filters/locations' */
-  getLocations = async (req: Request, res: Response<LocationResponse>) => {
+  /** GET all MODULES'/api/filters/modules' */
+  getModules = async (req: Request, res: Response<ModuleResponse>) => {
     try {
-      const allLocations = await this.repository.getAllLocations();
+      const { unitIds, locationIds } = req.query;
+
+      const parsedUnitIds = unitIds
+        ? (unitIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+      const parsedLocationIds = locationIds
+        ? (locationIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+
+      const allModules = await this.repository.getModulesFiltered(
+        parsedUnitIds,
+        parsedLocationIds,
+      );
       res.json({
-        locations: allLocations,
+        modules: allModules,
       });
     } catch (error) {
-      console.error('Error fetching locations:', error);
-      res.status(500).json({ locations: [] });
+      console.error('Error fetching modules:', error);
+      res.status(500).json({ modules: [] });
     }
   };
 
   /** GET all UNITS - '/api/filters/units' */
-  getUnits = async (req: Request, res: Response<UnitResponse>) => {
+  getFilteredUnits = async (req: Request, res: Response<UnitResponse>) => {
     try {
-      const allUnits = await this.repository.getAllUnits();
+      // get moduleIds from query string
+      const { moduleIds, locationIds } = req.query;
+
+      // parse moduleIds from query string to array of numbers
+      const parsedModuleIds = moduleIds
+        ? (moduleIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+
+      const parsedLocationIds = locationIds
+        ? (locationIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+
+      const allUnits = await this.repository.getUnitsFiltered(
+        parsedModuleIds,
+        parsedLocationIds,
+      );
 
       res.json({
         units: allUnits,
@@ -42,19 +81,41 @@ export class FilterHandler {
     }
   };
 
-  /** GET all MODULES'/api/filters/modules' */
-  getModules = async (req: Request, res: Response<ModuleResponse>) => {
+  /** GET all LOCATIONS - '/api/filters/locations' */
+  getFilteredLocations = async (
+    req: Request,
+    res: Response<LocationResponse>,
+  ) => {
     try {
-      const allModules = await this.repository.getAllModules();
+      const { unitIds, moduleIds } = req.query;
+
+      // parse unitIds from query string to array of numbers
+      const parsedUnitIds = unitIds
+        ? (unitIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+
+      const parsedModuleIds = moduleIds
+        ? (moduleIds as string)
+            .split(',')
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id))
+        : [];
+
+      const allLocations = await this.repository.getLocationsFiltered(
+        parsedUnitIds,
+        parsedModuleIds,
+      );
       res.json({
-        modules: allModules,
+        locations: allLocations,
       });
     } catch (error) {
-      console.error('Error fetching modules:', error);
-      res.status(500).json({ modules: [] });
+      console.error('Error fetching locations:', error);
+      res.status(500).json({ locations: [] });
     }
   };
-  
 
   /** DO NOT CHANGE THIS HANDLER - this one checks you provided body payload of selected filters */
   validateFilters = async (
