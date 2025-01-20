@@ -5,14 +5,13 @@ export const createFilterRouter = (filterHandler: FilterHandler): Router => {
   const router = Router();
 
   /** Write you routes here*/
-  // GET MODULES - '/api/filters/modules'
+  // GET MODULES - ex: '/api/filters/modules' or 'api/filters/modules?unitIds=2&locationIds='
   router.get('/modules', filterHandler.getModules);
 
-  // GET UNITS - '/api/filters/units'
-  // router.get('/units', filterHandler.getUnits);
+  // GET UNITS - ex: '/api/filters/units' or 'api/filters/units?moduleIds=2&locationIds=1'
   router.get('/units', filterHandler.getFilteredUnits);
 
-  // GET LOCATIONS - '/api/filters/locations'
+  // GET LOCATIONS - ex: '/api/filters/locations' or 'api/filters/locations?unitIds=2&moduleIds=1'
   router.get('/locations', filterHandler.getFilteredLocations);
 
   /** DO NOT TOUCH THIS ROUTE - it checks your body payload to validate whether you fetched correct filters

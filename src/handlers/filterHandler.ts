@@ -37,6 +37,7 @@ export class FilterHandler {
         parsedUnitIds,
         parsedLocationIds,
       );
+
       res.json({
         modules: allModules,
       });
@@ -108,6 +109,7 @@ export class FilterHandler {
         parsedUnitIds,
         parsedModuleIds,
       );
+
       res.json({
         locations: allLocations,
       });

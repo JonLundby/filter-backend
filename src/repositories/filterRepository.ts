@@ -47,55 +47,51 @@ export class FilterRepository {
 
   /** Fetch UNITS filtered*/
   async getUnitsFiltered(
-  moduleIds: number[],
-  locationIds: number[]
-): Promise<Unit[]> {
-  // If no filters are provided, return all units
-  if (!moduleIds?.length && !locationIds?.length) {
-    return this.db.select().from(units);
+    moduleIds: number[],
+    locationIds: number[],
+  ): Promise<Unit[]> {
+    // If no filters are provided, return all units
+    if (!moduleIds?.length && !locationIds?.length) {
+      return this.db.select().from(units);
+    }
+
+    // Query to fetch valid units based on moduleIds
+    let validUnitIdsFromModules: number[] = [];
+    if (moduleIds?.length) {
+      const validUnitsForModules = await this.db
+        .select({ unitId: moduleUnitMapping.unitId })
+        .from(moduleUnitMapping)
+        .where(inArray(moduleUnitMapping.moduleId, moduleIds));
+
+      validUnitIdsFromModules = validUnitsForModules.map(u => u.unitId);
+    }
+
+    // Query to fetch valid units based on locationIds
+    let validUnitIdsFromLocations: number[] = [];
+    if (locationIds?.length) {
+      const validUnitsForLocations = await this.db
+        .select({ unitId: unitLocationMapping.unitId })
+        .from(unitLocationMapping)
+        .where(inArray(unitLocationMapping.locationId, locationIds));
+
+      validUnitIdsFromLocations = validUnitsForLocations.map(u => u.unitId);
+    }
+
+    // Combine valid unit IDs from moduleIds and locationIds (intersection if both are provided)
+    let validUnitIds: number[] = [];
+    if (moduleIds?.length && locationIds?.length) {
+      validUnitIds = validUnitIdsFromModules.filter(unitId =>
+        validUnitIdsFromLocations.includes(unitId),
+      );
+    } else if (moduleIds?.length) {
+      validUnitIds = validUnitIdsFromModules;
+    } else if (locationIds?.length) {
+      validUnitIds = validUnitIdsFromLocations;
+    }
+
+    // Fetch and return the units matching the valid unit IDs
+    return this.db.select().from(units).where(inArray(units.id, validUnitIds));
   }
-
-  // Query to fetch valid units based on moduleIds
-  let validUnitIdsFromModules: number[] = [];
-  if (moduleIds?.length) {
-    const validUnitsForModules = await this.db
-      .select({ unitId: moduleUnitMapping.unitId })
-      .from(moduleUnitMapping)
-      .where(inArray(moduleUnitMapping.moduleId, moduleIds));
-
-    validUnitIdsFromModules = validUnitsForModules.map((u) => u.unitId);
-  }
-
-  // Query to fetch valid units based on locationIds
-  let validUnitIdsFromLocations: number[] = [];
-  if (locationIds?.length) {
-    const validUnitsForLocations = await this.db
-      .select({ unitId: unitLocationMapping.unitId })
-      .from(unitLocationMapping)
-      .where(inArray(unitLocationMapping.locationId, locationIds));
-
-    validUnitIdsFromLocations = validUnitsForLocations.map((u) => u.unitId);
-  }
-
-  // Combine valid unit IDs from moduleIds and locationIds (intersection if both are provided)
-  let validUnitIds: number[] = [];
-  if (moduleIds?.length && locationIds?.length) {
-    validUnitIds = validUnitIdsFromModules.filter((unitId) =>
-      validUnitIdsFromLocations.includes(unitId)
-    );
-  } else if (moduleIds?.length) {
-    validUnitIds = validUnitIdsFromModules;
-  } else if (locationIds?.length) {
-    validUnitIds = validUnitIdsFromLocations;
-  }
-
-  // Fetch and return the units matching the valid unit IDs
-  return this.db
-    .select()
-    .from(units)
-    .where(inArray(units.id, validUnitIds));
-}
-
 
   /** Fetch LOCATIONS filtered*/
   async getLocationsFiltered(
